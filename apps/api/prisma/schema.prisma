@@ -1,0 +1,149 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/database/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Users {
+  id              String            @id @default(uuid()) @db.Uuid
+  username        String            @db.VarChar(50)
+  email           String            @unique @db.VarChar(255)
+  image_url       String?           @db.VarChar(2048)
+  invoiceReceipts Invoice_receipt[]
+  // doReceipts      Do_receipt[]
+  // plReceipts      Pl_receipt[]
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Pic {
+  id              String            @id @default(uuid()) @db.Uuid
+  name            String            @db.VarChar(100)
+  team            String?           @db.VarChar(100)
+  email           String?           @db.VarChar(255)
+  phone           String?           @db.VarChar(20)
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  invoiceReceipts Invoice_receipt[]
+  // plReceipts      Pl_receipt[]
+  // doReceipts      Do_receipt[]
+
+  @@map("pics")
+}
+
+model Silo {
+  id              String            @id @default(uuid()) @db.Uuid
+  name            String            @db.VarChar(100)
+  description     String?           @db.Text
+  image_url       String?           @db.VarChar(2048)
+  invoiceReceipts Invoice_receipt[]
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  @@map("silos")
+}
+
+model Vendor {
+  id              String            @id @default(uuid()) @db.Uuid
+  name            String            @db.VarChar(100)
+  pic             String?           @db.VarChar(100)
+  email           String?           @db.VarChar(255)
+  phone           String?           @db.VarChar(20)
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  invoiceReceipts Invoice_receipt[]
+
+  @@map("vendors")
+}
+
+model Customer {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(100)
+  email     String?  @db.VarChar(255)
+  phone     String?  @db.VarChar(20)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  // doReceipts Do_receipt[]
+
+  @@map("customers")
+}
+
+model Invoice_receipt {
+  id          String    @id @default(uuid()) @db.Uuid
+  user_id     String    @db.Uuid
+  register_no String    @unique @db.VarChar(50)
+  submit_date DateTime
+  silo_id     String    @db.Uuid
+  pic_id      String    @db.Uuid
+  vendor_id   String?   @db.Uuid
+  invoice_no  String?   @db.VarChar(50)
+  po_no       String?   @db.VarChar(50)
+  latest_date DateTime?
+  note        String?   @db.Text
+  scan_date   DateTime?
+  upload_date DateTime?
+  is_urgent   Boolean   @default(false)
+  is_done     Boolean   @default(false)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  user        Users     @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  silo        Silo      @relation(fields: [silo_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  pic         Pic       @relation(fields: [pic_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  vendor      Vendor?   @relation(fields: [vendor_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([user_id])
+  @@index([silo_id])
+  @@index([pic_id])
+  @@index([vendor_id])
+  @@map("invoice_receipts")
+}
+
+// model Do_receipt {
+//   id          String    @id @default(uuid()) @db.Uuid
+//   user_id     String    @db.Uuid
+//   register_no String    @unique @db.VarChar(50)
+//   pic_id      String    @db.Uuid
+//   submit_date DateTime
+//   doc_date    DateTime
+//   do_no       String    @db.VarChar(50)
+//   pid_no      String?   @db.VarChar(50)
+//   customer_id String?   @db.Uuid
+//   note        String?   @db.Text
+//   is_urgent   Boolean   @default(false)
+//   is_done     Boolean   @default(false)
+//   createdAt   DateTime  @default(now()) @map("created_at")
+//   updatedAt   DateTime  @updatedAt @map("updated_at")
+//   user        Users     @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+//   customer    Customer? @relation(fields: [customer_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+//   pic         Pic       @relation(fields: [pic_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+//   @@index([user_id])
+//   @@index([customer_id])
+//   @@map("do_receipts")
+// }
+
+// model Pl_receipt {
+//   id          String   @id @default(uuid()) @db.Uuid
+//   user_id     String   @db.Uuid
+//   register_no String   @unique @db.VarChar(50)
+//   pic_id      String   @db.Uuid
+//   submit_date DateTime
+//   ship_ref    String?  @db.VarChar(50)
+//   pl_no       String   @db.VarChar(50)
+//   note        String?  @db.Text
+//   is_urgent   Boolean  @default(false)
+//   is_done     Boolean  @default(false)
+//   createdAt   DateTime @default(now()) @map("created_at")
+//   updatedAt   DateTime @updatedAt @map("updated_at")
+//   user        Users    @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+//   pic         Pic      @relation(fields: [pic_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+//   @@index([user_id])
+//   @@map("pl_receipts")
+// }
