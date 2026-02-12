@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { PicService } from './pic.service';
 import { CreatePicDto } from './dto/create-pic.dto';
 import { UpdatePicDto } from './dto/update-pic.dto';
@@ -8,6 +18,7 @@ export class PicController {
   constructor(private readonly picService: PicService) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('pic_image'))
   create(@Body() createPicDto: CreatePicDto) {
     return this.picService.create(createPicDto);
   }
@@ -19,16 +30,22 @@ export class PicController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.picService.findOne(+id);
+    return this.picService.findOne(id);
   }
 
   @Patch(':id')
+  @UseInterceptors(FileInterceptor('pic_image'))
   update(@Param('id') id: string, @Body() updatePicDto: UpdatePicDto) {
-    return this.picService.update(+id, updatePicDto);
+    return this.picService.update(id, updatePicDto);
+  }
+
+  @Delete()
+  removeAll() {
+    return this.picService.removeAll();
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.picService.remove(+id);
+    return this.picService.remove(id);
   }
 }
