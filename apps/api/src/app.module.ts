@@ -7,6 +7,7 @@ import { PrismaModule } from './database/prisma.module';
 import { SiloModule } from './modules/silo/silo.module';
 import { VendorModule } from './modules/vendor/vendor.module';
 import { CustomerModule } from './modules/customer/customer.module';
+import { InvoiceModule } from './modules/invoice/invoice.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CustomerModule } from './modules/customer/customer.module';
     SiloModule,
     VendorModule,
     CustomerModule,
+    InvoiceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
